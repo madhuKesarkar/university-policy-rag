@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     langfuse_secret_key: str = ""
     langfuse_host: str = "http://localhost:3001"
 
+    # CORS: comma-separated allowed origins. Defaults to local dev; set explicitly to the
+    # deployed frontend's URL(s) in production rather than leaving this wildcard-open.
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+
 
 settings = Settings()
 

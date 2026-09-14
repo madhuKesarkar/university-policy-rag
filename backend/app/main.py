@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import settings
 from app.routers import admin, ask, auth
 
 app = FastAPI(
@@ -9,11 +10,13 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Dev-friendly CORS: the Next.js frontend runs on a different port (3000) than the API (8000).
-# Tightened to the frontend's real origin(s) at deploy time in step 9, not left wildcard-open.
+# CORS: origins come from settings.allowed_origins (ALLOWED_ORIGINS env var) — defaults to
+# local dev ports, set to the deployed frontend's real URL(s) in production rather than a
+# wildcard. Same-origin callers (e.g. the Next.js rewrite proxy) don't need CORS at all; this
+# only matters for a browser calling the API's origin directly.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[o.strip() for o in settings.allowed_origins.split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

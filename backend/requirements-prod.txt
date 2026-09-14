@@ -1,0 +1,39 @@
+# Dependencies for the DEPLOYED live API only — deliberately excludes ingestion-only packages
+# (docling, pypdf, reportlab, langchain-text-splitters) and eval-only packages (ragas, nltk,
+# langchain-openai, langchain-huggingface). Ingestion/eval are batch jobs you run locally or as
+# a separate one-off task, not part of the request path — pulling their heavy dependencies
+# (docling alone drags in a layout model + OCR stack) into the deployed container would bloat
+# the image and memory footprint for no runtime benefit. See backend/requirements.txt for the
+# full local-dev set.
+
+# --- API ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-multipart==0.0.9
+email-validator==2.2.0
+
+# --- Auth ---
+python-jose[cryptography]==3.3.0
+bcrypt==5.0.0
+
+# --- DB ---
+sqlalchemy==2.0.35
+psycopg[binary]==3.2.2
+pgvector==0.3.4
+
+# --- Embeddings / reranking (local, free) — needed at query time, not just ingestion ---
+sentence-transformers==3.1.1
+torch==2.4.1
+
+# --- LLM providers (free tiers) ---
+groq==1.7.0
+google-generativeai==0.8.2
+
+# --- Tracing ---
+langfuse==2.51.3
+
+# --- Utility ---
+python-dotenv==1.0.1
+tenacity==9.0.0

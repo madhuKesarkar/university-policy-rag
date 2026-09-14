@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+ingestion/sample_docs/*.pdf
+tests/

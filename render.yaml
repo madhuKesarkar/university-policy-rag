@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: university-policy-rag-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false # paste your Supabase (or Neon) pooled connection string here
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRE_MINUTES
+        value: "120"
+      - key: EMBEDDING_MODEL
+        value: BAAI/bge-small-en-v1.5
+      - key: RERANKER_MODEL
+        value: BAAI/bge-reranker-base
+      - key: LLM_PROVIDER
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: RETRIEVAL_TOP_K
+        value: "25"
+      - key: RERANK_TOP_K
+        value: "8"
+      - key: MIN_CONFIDENCE_SCORE
+        value: "0.35"
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+      - key: LANGFUSE_HOST
+        value: https://cloud.langfuse.com
+      - key: ALLOWED_ORIGINS
+        sync: false # set to your deployed Vercel frontend URL, e.g. https://your-app.vercel.app

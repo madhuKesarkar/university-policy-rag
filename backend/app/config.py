@@ -20,7 +20,12 @@ class Settings(BaseSettings):
 
     # Embeddings / reranker
     embedding_model: str = "BAAI/bge-small-en-v1.5"
-    reranker_model: str = "BAAI/bge-reranker-base"
+    # BAAI/bge-reranker-base (higher quality, ~1.0GB weights) was our original choice, but that
+    # alone exceeds Render free tier's 512MB RAM limit once combined with the embedder + torch
+    # baseline (confirmed via an actual OOM crash in production, not theory). This model is
+    # ~12x smaller (~87MB) and comfortably fits — swap back to bge-reranker-base if you're on a
+    # host with more headroom and want the quality edge.
+    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
     # LLM
     llm_provider: str = "groq"

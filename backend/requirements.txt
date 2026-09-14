@@ -1,0 +1,40 @@
+# --- API ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-multipart==0.0.9
+email-validator==2.2.0
+
+# --- Auth ---
+python-jose[cryptography]==3.3.0
+bcrypt==5.0.0
+
+# --- DB ---
+sqlalchemy==2.0.35
+psycopg[binary]==3.2.2
+pgvector==0.3.4
+
+# --- Ingestion ---
+docling==2.5.2
+pypdf==5.0.1
+langchain-text-splitters==0.3.0
+
+# --- Embeddings / reranking (local, free) ---
+sentence-transformers==3.1.1
+torch==2.4.1
+
+# --- LLM providers (free tiers) ---
+groq==1.7.0
+google-generativeai==0.8.2
+
+# --- Eval & tracing ---
+ragas==0.2.3
+nltk==3.10.3               # transitive ragas dep not pulled automatically (bleu score metric)
+langchain-openai==0.3.19   # wires ragas' judge LLM to Groq's OpenAI-compatible endpoint (free)
+langchain-huggingface==0.3.1  # wires ragas' judge embeddings to our local bge-small (free)
+langfuse==2.51.3
+
+# --- Utility ---
+python-dotenv==1.0.1
+tenacity==9.0.0

@@ -1,0 +1,67 @@
+[
+  {
+    "filename": "CS4780_ML_Syllabus.pdf",
+    "title": "CS 4780 — Machine Learning: Course Syllabus",
+    "doc_type": "syllabus",
+    "department": "Computer Science",
+    "academic_year": "2025-2026",
+    "course_code": "CS 4780",
+    "version": "Fall 2025",
+    "effective_date": "2025-08-25",
+    "last_reviewed_date": "2025-08-15",
+    "review_cycle_years": 2,
+    "allowed_roles": ["student", "professor", "admin"]
+  },
+  {
+    "filename": "STAT3000_Syllabus.pdf",
+    "title": "STAT 3000 — Introduction to Statistics: Course Syllabus",
+    "doc_type": "syllabus",
+    "department": "Statistics",
+    "academic_year": "2025-2026",
+    "course_code": "STAT 3000",
+    "version": "Fall 2025",
+    "effective_date": "2025-08-25",
+    "last_reviewed_date": "2025-08-10",
+    "review_cycle_years": 2,
+    "allowed_roles": ["student", "professor", "admin"]
+  },
+  {
+    "filename": "Prerequisite_Override_Policy.pdf",
+    "title": "University Policy: Prerequisite Override and Waiver Procedure",
+    "doc_type": "policy",
+    "department": null,
+    "academic_year": null,
+    "course_code": null,
+    "version": "v1.0",
+    "effective_date": "2021-01-15",
+    "last_reviewed_date": "2021-01-15",
+    "review_cycle_years": 2,
+    "allowed_roles": ["student", "professor", "admin"]
+  },
+  {
+    "filename": "Academic_Integrity_Policy.pdf",
+    "title": "University Academic Integrity Policy",
+    "doc_type": "policy",
+    "department": null,
+    "academic_year": null,
+    "course_code": null,
+    "version": "v3.0",
+    "effective_date": "2025-03-01",
+    "last_reviewed_date": "2025-03-01",
+    "review_cycle_years": 3,
+    "allowed_roles": ["student", "professor", "admin"]
+  },
+  {
+    "filename": "CS5000_DeepLearning_Syllabus.pdf",
+    "title": "CS 5000 — Deep Learning: Course Syllabus (Draft)",
+    "doc_type": "syllabus",
+    "department": "Computer Science",
+    "academic_year": "2025-2026",
+    "course_code": "CS 5000",
+    "version": "Draft",
+    "effective_date": null,
+    "last_reviewed_date": "2025-09-01",
+    "review_cycle_years": 1,
+    "allowed_roles": ["professor", "admin"]
+  }
+]

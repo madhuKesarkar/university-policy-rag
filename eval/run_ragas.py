@@ -121,19 +121,34 @@ def main() -> None:
     categories = sorted({r["category"] for r in sampled})
     print(
         f"Evaluating {len(dataset)} rows across {len(categories)} categories {categories} "
-        f"with metrics {args.metrics} (of {len(eligible)} eligible)..."
+        f"with metrics {args.metrics} (of {len(eligible)} eligible), "
+        f"judge={settings.ragas_judge_provider}..."
     )
 
-    # Judge LLM: Groq via its OpenAI-compatible endpoint — free, no separate SDK needed for ragas.
-    judge_llm = LangchainLLMWrapper(
-        ChatOpenAI(
+    # Judge LLM: on a SEPARATE provider/quota from the main app by default (settings.
+    # ragas_judge_provider) — Groq is what the live app uses, so sharing it means eval runs
+    # compete with real usage for the same daily token budget. Confirmed this directly: both
+    # exhausted the same ~200K/day Groq limit on the same day during testing. Both providers
+    # are reached via their OpenAI-compatible endpoints, so no extra SDK is needed either way.
+    if settings.ragas_judge_provider == "gemini":
+        judge_chat_model = ChatOpenAI(
+            model=settings.gemini_model,
+            api_key=settings.gemini_api_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            temperature=0.0,
+            timeout=60,
+        )
+    elif settings.ragas_judge_provider == "groq":
+        judge_chat_model = ChatOpenAI(
             model=settings.groq_model,
             api_key=settings.groq_api_key,
             base_url="https://api.groq.com/openai/v1",
             temperature=0.0,
             timeout=60,
         )
-    )
+    else:
+        raise ValueError(f"Unknown RAGAS_JUDGE_PROVIDER: {settings.ragas_judge_provider!r}")
+    judge_llm = LangchainLLMWrapper(judge_chat_model)
     # Judge embeddings: the same local, free bge-small model used everywhere else in this project.
     judge_embeddings = LangchainEmbeddingsWrapper(HuggingFaceEmbeddings(model_name=settings.embedding_model))
 

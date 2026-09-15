@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
 
+    # Ragas eval's judge LLM is independently configurable from the main app's LLM_PROVIDER —
+    # deliberately so. Sharing Groq between the live app and the eval judge means eval runs
+    # compete with real usage for the same ~200K-tokens/day budget (hit this directly: both
+    # exhausted the same day during testing). Defaulting the eval judge to Gemini keeps them on
+    # separate quotas entirely.
+    ragas_judge_provider: str = "gemini"
+
     # Retrieval tuning
     retrieval_top_k: int = 25
     rerank_top_k: int = 8

@@ -154,23 +154,29 @@ def main() -> None:
 
     metrics = [ALL_METRICS[name] for name in args.metrics]
 
-    # Groq's free tier has a per-minute request-rate limit; ragas's default 16 concurrent
-    # workers blows straight through it (surfaced as opaque TimeoutErrors — the real 429s were
-    # being retried into the ground rather than raised). Low concurrency helps that.
-    #
-    # BUT: ragas's own default retry policy (max_retries=10, up to 60s backoff each) means one
-    # job that keeps soft-failing (e.g. the judge LLM returns something ragas's own parser
-    # can't handle — not necessarily a Groq-side error at all) can silently grind for 20+
-    # minutes with zero output, indistinguishable from a true hang. Confirmed this directly:
-    # process alive, CPU time frozen, no error, no progress, for many minutes straight. Failing
-    # fast (few retries, short timeout) trades "eventually maybe succeeds" for "you actually see
-    # what broke" — the right tradeoff for a small eval run you're watching, not a background job.
+    # Both free-tier judge options are rate-limited, but in DIFFERENT shapes, confirmed by
+    # hitting each directly rather than assuming:
+    #   - Groq: a large daily TOKEN budget (~200K/day) — fine with some concurrency, the risk is
+    #     burning the shared budget the live app also needs.
+    #   - Gemini: a tiny per-minute REQUEST cap on the free tier (5 RPM for gemini-3.6-flash) —
+    #     concurrency itself is the problem; even max_workers=2 bursts past it immediately.
+    # ragas's own default retry policy (max_retries=10, up to 60s backoff each) also means one
+    # job that keeps soft-failing can silently grind for 20+ minutes with zero output,
+    # indistinguishable from a true hang — confirmed directly (process alive, CPU frozen, no
+    # progress, for many minutes). So: serialize for Gemini's RPM ceiling, keep retries short
+    # enough to see failures instead of appearing to hang, but long enough (Google's own error
+    # suggests ~5-7s) to actually recover from a single rate-limited call.
+    if settings.ragas_judge_provider == "gemini":
+        run_config = RunConfig(max_workers=1, timeout=30, max_retries=4, max_wait=15)
+    else:
+        run_config = RunConfig(max_workers=2, timeout=30, max_retries=2, max_wait=10)
+
     result = evaluate(
         dataset,
         metrics=metrics,
         llm=judge_llm,
         embeddings=judge_embeddings,
-        run_config=RunConfig(max_workers=2, timeout=30, max_retries=2, max_wait=10),
+        run_config=run_config,
         raise_exceptions=False,  # one bad row becomes NaN in that row's score, not a killed run
     )
 

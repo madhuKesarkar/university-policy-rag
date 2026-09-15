@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     groq_model: str = "openai/gpt-oss-20b"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
 
     # Ragas eval's judge LLM is independently configurable from the main app's LLM_PROVIDER —
     # deliberately so. Sharing Groq between the live app and the eval judge means eval runs

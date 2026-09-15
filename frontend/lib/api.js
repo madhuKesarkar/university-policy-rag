@@ -2,8 +2,18 @@
 // to the FastAPI backend), so the browser never needs a direct route to the backend's port.
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-async function handleResponse(res) {
+// `authed: true` means this call carries a token that's expected to already be valid — a 401
+// there means the token expired (JWTs are set to expire after 2 hours; see backend/app/config.py),
+// not "wrong password", so the right move is to clear it and send the user back to log in again
+// rather than show a raw "Could not validate credentials" error on whatever page they were on.
+// login/register calls must NOT set this — a 401 there is a real "wrong password" the user needs
+// to see and correct, not a session expiry.
+async function handleResponse(res, { authed = false } = {}) {
   if (!res.ok) {
+    if (authed && res.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
     let detail = res.statusText;
     try {
       const data = await res.json();
@@ -46,6 +56,11 @@ export async function register({ email, password, fullName, role, department }) 
 }
 
 export async function me(token) {
+  // NOT `authed: true` — AuthProvider calls this on every page load (including /login itself)
+  // to silently check a stored token. Auto-redirecting on a 401 here would fire on the login
+  // page too, before the user has done anything, and risks a reload loop. AuthProvider already
+  // handles an invalid/expired stored token correctly on its own (clears it, leaves `user`
+  // null, and each protected page's own redirect effect takes it from there).
   const res = await fetch(`${API_URL}/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -58,12 +73,12 @@ export async function ask(token, question) {
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ question }),
   });
-  return handleResponse(res);
+  return handleResponse(res, { authed: true });
 }
 
 export async function analytics(token, days = 30) {
   const res = await fetch(`${API_URL}/admin/analytics?days=${days}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return handleResponse(res);
+  return handleResponse(res, { authed: true });
 }

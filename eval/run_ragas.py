@@ -79,7 +79,17 @@ def build_eligible_rows(raw_results: list[dict]) -> list[dict]:
                 # not a mistake to "fix" back.
                 "user_input": tc["question"],
                 "response": resp["answer"] or "",
-                "retrieved_contexts": [p["content"] for p in resp["retrieved_passages"]],
+                # Must mirror what the LLM actually saw (app/services/llm.py's
+                # _build_user_prompt), staleness flag included — not just raw passage text.
+                # Passing less than the LLM actually had makes faithfulness score a legitimately
+                # grounded claim (e.g. "flagged as outdated") as unsupported, since that flag is
+                # injected prompt metadata, not literal chunk content. Confirmed this directly:
+                # a real 0.0 faithfulness score on a factually-correct staleness answer traced
+                # back to exactly this gap, not a real system defect.
+                "retrieved_contexts": [
+                    p["content"] + (" [FLAGGED: not recently reviewed, may be outdated]" if p["citation"]["is_stale"] else "")
+                    for p in resp["retrieved_passages"]
+                ],
                 "reference": tc["ground_truth"],
             }
         )

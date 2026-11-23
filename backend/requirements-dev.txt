@@ -1,0 +1,9 @@
+pytest
+pytest-mock
+hypothesis
+tiktoken
+pydantic-settings
+email-validator
+sqlalchemy
+numpy
+langchain-text-splitters
